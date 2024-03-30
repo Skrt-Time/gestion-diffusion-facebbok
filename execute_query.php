@@ -1,50 +1,40 @@
 <?php
-$fieldSelect = $_POST['fieldSelect'];
+// Récupérer la requête SQL envoyée depuis le client
+$sqlQuery = $_POST['sqlQuery'];
 
-if(!empty($fieldSelect)) {
-    $sqlQuery = "";
-    switch($fieldSelect) {
-        case 'date':
-            $startDate = $_POST['startDate'];
-            $endDate = $_POST['endDate'];
-            $sqlQuery = "SELECT * FROM facebook_infos.users WHERE date BETWEEN '$startDate' AND '$endDate'";
-            break;
-        default:
-            $conditionValue = $_POST['conditionValue'];
-            $sqlQuery = "SELECT * FROM facebook_infos.users WHERE $fieldSelect = '$conditionValue'";
-            break;
-    
-    }
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "facebook_infos";
+// Exécuter la requête SQL et récupérer les résultats
+// Remplacez cette partie par votre propre logique pour exécuter la requête SQL
+// et récupérer les résultats depuis votre base de données
 
-    $conn = new mysqli($servername, $username, $password, $dbname);
+// Exemple de connexion à une base de données MySQL
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "facebook_infos";
 
-    if ($conn->connect_error) {
-        die("La connexion a échoué : " . $conn->connect_error);
-    }
+// Créer une connexion
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    $result = $conn->query($sqlQuery);
-
-    $numUsers = $result->num_rows;
-    echo "<p>$numUsers utilisateurs trouvés</p>";
-
-    if ($result->num_rows > 0) {
-        echo "<table>";
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            foreach ($row as $value) {
-                echo "<td>$value</td>";
-            }
-            echo "</tr>";
-        }
-        echo "</table>";
-    }
-
-    $conn->close();
-} else {
-    echo "Veuillez sélectionner un champ.";
+// Vérifier la connexion
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Exécuter la requête SQL
+$result = $conn->query($sqlQuery);
+
+// Récupérer les résultats et les stocker dans un tableau
+$results = array();
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $results[] = $row;
+    }
+}
+
+// Fermer la connexion à la base de données
+$conn->close();
+
+// Retourner les résultats au format JSON
+header('Content-Type: application/json');
+echo json_encode($results);
 ?>
